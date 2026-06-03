@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>P6 Express | Domicilios en Quibdó</title>
+  <meta name="description" content="Domicilios rápidos, confiables y cercanos en Quibdó. Comidas, compras, farmacia, mandados y paquetes." />
+  <link rel="icon" type="image/png" href="img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --lime: #C8FF00;
+      --lime-dark: #9DC800;
+      --lime-pale: #EDFFC0;
+      --black: #0A0A0A;
+      --dark: #111412;
+      --dark2: #1A1E17;
+      --dark3: #242820;
+      --white: #FFFFFF;
+      --gray: #B0B8A8;
+      --gray2: #6B7565;
+      --card-bg: #181C16;
+      --nav-h: 68px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: var(--dark);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--dark); }
+    ::-webkit-scrollbar-thumb { background: var(--dark3); border-radius: 3px; }
+
+    /* ── NAV ── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: var(--nav-h);
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(200,255,0,0.10);
+      transition: background 0.3s;
+    }
+    .nav__inner {
+      max-width: 1100px; margin: 0 auto;
+      height: 100%; padding: 0 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav__logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav__logo-svg { width: 42px; height: 42px; }
+    .nav__logo-text { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 1.4rem; color: var(--white); letter-spacing: 0.5px; line-height: 1; }
+    .nav__logo-text span { color: var(--lime); }
+    .nav__links { display: flex; align-items: center; gap: 0.25rem; list-style: none; }
+    .nav__links a { font-size: 0.875rem; font-weight: 500; color: var(--gray); text-decoration: none; padding: 0.4rem 0.75rem; border-radius: 6px; transition: color 0.2s, background 0.2s; }
+    .nav__links a:hover { color: var(--white); background: rgba(255,255,255,0.06); }
+    .nav__cta {
+      background: var(--lime) !important; color: var(--black) !important;
+      font-weight: 700; border-radius: 8px !important;
+      padding: 0.45rem 1.1rem !important;
+      transition: opacity 0.2s !important;
+    }
+    .nav__cta:hover { opacity: 0.88 !important; background: var(--lime) !important; }
+    .nav__burger { display: none; background: none; border: none; cursor: pointer; padding: 8px; flex-direction: column; gap: 5px; }
+    .nav__burger span { display: block; width: 22px; height: 2px; background: var(--white); border-radius: 2px; transition: 0.3s; }
+    .nav__burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav__burger.open span:nth-child(2) { opacity: 0; }
+    .nav__burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    @media (max-width: 768px) {
+      .nav__burger { display: flex; }
+      .nav__links {
+        display: none; position: fixed;
+        top: var(--nav-h); left: 0; right: 0;
+        flex-direction: column; align-items: stretch;
+        background: var(--black);
+        padding: 1rem 1.5rem 1.5rem;
+        border-bottom: 1px solid rgba(200,255,0,0.12);
+        gap: 0.25rem;
+      }
+      .nav__links.open { display: flex; }
+      .nav__links a { padding: 0.75rem 1rem; font-size: 1rem; }
+      .nav__cta { text-align: center; margin-top: 0.5rem; }
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100svh;
+      padding-top: var(--nav-h);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 2rem;
+      max-width: 1100px; margin: 0 auto;
+      padding-left: 1.5rem; padding-right: 1.5rem;
+      position: relative;
+    }
+    .hero::before {
+      content: '';
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse 70% 60% at 60% 40%, rgba(200,255,0,0.06) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+    .hero__content { position: relative; z-index: 1; }
+    .hero__badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(200,255,0,0.10);
+      border: 1px solid rgba(200,255,0,0.25);
+      border-radius: 100px; padding: 6px 14px;
+      font-size: 0.78rem; font-weight: 600; color: var(--lime);
+      letter-spacing: 0.5px; text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+    .badge__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--lime); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+
+    .hero__title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; line-height: 0.95;
+      font-size: clamp(3.5rem, 7vw, 5.5rem);
+      text-transform: uppercase;
+      letter-spacing: -1px;
+      margin-bottom: 1.25rem;
+    }
+    .hero__title em { font-style: normal; color: var(--lime); }
+    .hero__sub { font-size: 1.05rem; color: var(--gray); line-height: 1.65; max-width: 480px; margin-bottom: 2rem; }
+
+    .hero__actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 2.5rem; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 0.95rem;
+      text-decoration: none; border: none; cursor: pointer;
+      border-radius: 10px; padding: 0.7rem 1.5rem;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .btn--primary { background: var(--lime); color: var(--black); }
+    .btn--primary:hover { opacity: 0.88; }
+    .btn--ghost { background: transparent; color: var(--white); border: 1.5px solid rgba(255,255,255,0.18); }
+    .btn--ghost:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.35); }
+
+    .hero__stats { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+    .stat__num { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 2rem; color: var(--lime); display: block; line-height: 1; }
+    .stat__label { font-size: 0.75rem; color: var(--gray2); text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat__divider { width: 1px; height: 36px; background: rgba(255,255,255,0.12); }
+
+    /* Hero visual */
+    .hero__visual {
+      position: relative; z-index: 1;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .hero__logo-display {
+      position: relative;
+      width: min(380px, 100%);
+    }
+    .hero__logo-bg {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: var(--dark2);
+      border: 2px solid rgba(200,255,0,0.15);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .hero__logo-svg {
+      width: 80%;
+    }
+    .float-tag {
+      position: absolute;
+      background: var(--dark3);
+      border: 1px solid rgba(200,255,0,0.2);
+      border-radius: 100px;
+      padding: 6px 14px;
+      font-size: 0.8rem; font-weight: 700; color: var(--lime);
+      white-space: nowrap;
+    }
+    .float-tag--1 { top: 10%; right: -5%; }
+    .float-tag--2 { top: 50%; right: -8%; transform: translateY(-50%); }
+    .float-tag--3 { bottom: 15%; left: -5%; }
+
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: calc(var(--nav-h) + 2rem);
+        padding-bottom: 4rem;
+        text-align: center;
+      }
+      .hero__sub { margin: 0 auto 2rem; }
+      .hero__actions { justify-content: center; }
+      .hero__stats { justify-content: center; }
+      .hero__visual { order: -1; }
+      .hero__logo-display { width: min(280px, 85vw); }
+      .float-tag--1 { top: 5%; right: 0; }
+      .float-tag--2 { right: -2%; }
+      .float-tag--3 { left: 0; }
+    }
+
+    /* ── SECTION COMMONS ── */
+    .section { padding: 5rem 1.5rem; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .section-tag {
+      display: inline-block;
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--lime);
+      margin-bottom: 0.75rem;
+    }
+    .section-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; text-transform: uppercase;
+      font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+      line-height: 1; letter-spacing: -0.5px;
+    }
+    .section-title .accent { color: var(--lime); }
+    .section-header { text-align: center; margin-bottom: 3rem; }
+    .section-header .section-desc { color: var(--gray); margin-top: 0.75rem; font-size: 1rem; }
+
+    /* ── ABOUT ── */
+    .about { background: var(--dark2); }
+    .about__inner {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 4rem; align-items: center;
+    }
+    .about__text p { color: var(--gray); line-height: 1.75; margin-top: 1rem; }
+    .about__text .section-title { margin-bottom: 1rem; }
+    .about__chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+    .chip {
+      background: rgba(200,255,0,0.08);
+      border: 1px solid rgba(200,255,0,0.2);
+      border-radius: 100px; padding: 6px 14px;
+      font-size: 0.82rem; font-weight: 600; color: var(--lime);
+    }
+    .trust-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(200,255,0,0.15);
+      border-radius: 16px; padding: 1.75rem;
+    }
+    .trust-card__header { display: flex; align-items: center; gap: 12px; margin-bottom: 1.25rem; }
+    .trust-icon { font-size: 1.5rem; }
+    .trust-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 1.1rem; text-transform: uppercase; color: var(--white); }
+    .trust-list { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+    .trust-list li { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--gray); }
+    .trust-check { color: var(--lime); font-weight: 700; flex-shrink: 0; }
+    .trust-footer { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.07); font-size: 0.82rem; color: var(--lime); font-weight: 600; }
+
+    @media (max-width: 768px) {
+      .about__inner { grid-template-columns: 1fr; gap: 2rem; }
+    }
+
+    /* ── SERVICES ── */
+    .services { background: var(--dark); }
+    .services__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 1rem;
+    }
+    .service-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px; padding: 1.5rem;
+      position: relative; overflow: hidden;
+      transition: border-color 0.25s, transform 0.2s;
+      cursor: default;
+    }
+    .service-card:hover { border-color: rgba(200,255,0,0.35); transform: translateY(-3px); }
+    .service-card::before {
+      content: ''; position: absolute;
+      inset: 0; opacity: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(200,255,0,0.07) 0%, transparent 70%);
+      transition: opacity 0.3s;
+    }
+    .service-card:hover::before { opacity: 1; }
+    .service-card__icon { font-size: 2rem; margin-bottom: 0.75rem; }
+    .service-card h3 { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 1.2rem; text-transform: uppercase; margin-bottom: 0.4rem; }
+    .service-card p { font-size: 0.85rem; color: var(--gray); line-height: 1.55; }
+    .service-card__tag {
+      position: absolute; top: 1rem; right: 1rem;
+      background: var(--lime); color: var(--black);
+      font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+      border-radius: 100px; padding: 3px 10px;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .how { background: var(--dark2); }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      position: relative;
+    }
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 2rem; left: 12%; right: 12%; height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(200,255,0,0.3), transparent);
+    }
+    .step {
+      text-align: center; padding: 0 1rem;
+      position: relative;
+    }
+    .step__num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.75rem; font-weight: 800;
+      color: var(--lime); letter-spacing: 1px; text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .step__icon-wrap {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: var(--card-bg);
+      border: 2px solid rgba(200,255,0,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      margin: 0 auto 1rem;
+      position: relative; z-index: 1;
+    }
+    .step h3 { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 1rem; text-transform: uppercase; margin-bottom: 0.4rem; }
+    .step p { font-size: 0.82rem; color: var(--gray); line-height: 1.5; }
+
+    @media (max-width: 768px) {
+      .steps { grid-template-columns: 1fr 1fr; gap: 2rem; }
+      .steps::before { display: none; }
+    }
+    @media (max-width: 480px) {
+      .steps { grid-template-columns: 1fr; gap: 2rem; }
+    }
+
+    /* ── INFO SECTION ── */
+    .info-section { background: var(--dark); }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+    .info-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px; padding: 1.5rem;
+    }
+    .info-card__icon { font-size: 1.75rem; margin-bottom: 0.75rem; }
+    .info-card h3 { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 1.1rem; text-transform: uppercase; margin-bottom: 0.75rem; color: var(--white); }
+    .info-card p { font-size: 0.85rem; color: var(--gray); line-height: 1.6; }
+    .info-card__note { margin-top: 1rem; font-size: 0.78rem; font-weight: 600; color: #FFA940; background: rgba(255,169,64,0.1); border-radius: 8px; padding: 8px 12px; }
+    .info-card--policy { border-top: 2px solid rgba(255,169,64,0.4); }
+
+    .pay-method { display: flex; align-items: center; gap: 10px; padding: 0.6rem 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .pay-method:last-child { border-bottom: none; }
+    .pay-method__logo { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1rem; flex-shrink: 0; }
+    .pay-method__logo--nequi { background: #7B2D8B; color: #fff; }
+    .pay-method__logo--bc { background: #FFCD00; color: #000; }
+    .pay-method__name { display: block; font-size: 0.82rem; font-weight: 600; color: var(--white); }
+    .pay-method__num { display: block; font-size: 0.75rem; color: var(--gray); font-family: monospace; }
+    .copy-btn { margin-left: auto; background: none; border: none; cursor: pointer; font-size: 0.8rem; color: var(--gray2); padding: 4px; border-radius: 4px; transition: color 0.2s; }
+    .copy-btn:hover { color: var(--lime); }
+
+    .schedule__row { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; padding: 0.5rem 0; }
+    .schedule__days { font-size: 0.82rem; color: var(--gray); font-weight: 500; }
+    .schedule__time { display: block; font-size: 0.82rem; color: var(--white); font-weight: 600; text-align: right; }
+    .schedule__divider { height: 1px; background: rgba(255,255,255,0.07); margin: 0.25rem 0; }
+    .schedule__status { margin-top: 1rem; font-size: 0.78rem; font-weight: 700; text-align: center; padding: 6px 12px; border-radius: 100px; }
+    .status--open { background: rgba(200,255,0,0.1); color: var(--lime); }
+    .status--closed { background: rgba(255,80,80,0.1); color: #FF6B6B; }
+
+    @media (max-width: 900px) {
+      .info-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── CTA ── */
+    .cta {
+      background: var(--dark2);
+      padding: 6rem 1.5rem;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta::before {
+      content: '';
+      position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 400px;
+      background: radial-gradient(ellipse, rgba(200,255,0,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; text-transform: uppercase;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      line-height: 1; margin-bottom: 1rem;
+    }
+    .cta p { color: var(--gray); font-size: 1.05rem; max-width: 440px; margin: 0 auto 2rem; }
+    .cta__number { margin-top: 1.5rem; font-size: 0.9rem; color: var(--gray); }
+    .cta__number a { color: var(--lime); text-decoration: none; font-weight: 700; margin-left: 6px; }
+    .cta__number a:hover { text-decoration: underline; }
+    .btn--xl { font-size: 1.05rem; padding: 0.85rem 2rem; }
+
+    /* ── FOOTER ── */
+    .footer {
+      background: var(--black);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 3rem 1.5rem 2rem;
+    }
+    .footer__inner {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 2fr 1fr 1fr;
+      gap: 3rem; padding-bottom: 2rem;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .footer__brand p { font-size: 0.85rem; color: var(--gray2); line-height: 1.6; margin-top: 0.75rem; }
+    .footer__logo { display: flex; align-items: center; gap: 10px; }
+    .footer__logo-svg { width: 36px; height: 36px; }
+    .footer__logo-text { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 1.25rem; color: var(--white); letter-spacing: 0.5px; }
+    .footer__logo-text span { color: var(--lime); }
+    .footer__links h4, .footer__social h4 {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gray2);
+      margin-bottom: 1rem;
+    }
+    .footer__links a { display: block; font-size: 0.85rem; color: var(--gray); text-decoration: none; padding: 3px 0; transition: color 0.2s; }
+    .footer__links a:hover { color: var(--lime); }
+    .social-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      text-decoration: none; font-size: 0.85rem; font-weight: 600;
+      color: var(--white); background: var(--dark3);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; padding: 0.5rem 1rem;
+      transition: border-color 0.2s;
+    }
+    .social-btn:hover { border-color: rgba(200,255,0,0.35); color: var(--lime); }
+    .social-btn svg { width: 16px; height: 16px; }
+    .footer__bottom {
+      max-width: 1100px; margin: 1.5rem auto 0;
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;
+      font-size: 0.78rem; color: var(--gray2);
+    }
+    @media (max-width: 768px) {
+      .footer__inner { grid-template-columns: 1fr; gap: 2rem; }
+    }
+
+    /* ── WA FLOAT ── */
+    .wa-float {
+      position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 200;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: #25D366;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none; box-shadow: 0 4px 20px rgba(37,211,102,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .wa-float:hover { transform: scale(1.1); box-shadow: 0 6px 26px rgba(37,211,102,0.55); }
+    .wa-float svg { width: 28px; height: 28px; fill: #fff; }
+    .wa-float__tooltip {
+      position: absolute; right: calc(100% + 10px);
+      background: var(--black); color: var(--white);
+      font-size: 0.78rem; font-weight: 600; white-space: nowrap;
+      padding: 5px 12px; border-radius: 100px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .wa-float:hover .wa-float__tooltip { opacity: 1; }
+
+    /* ── INLINE LOGO SVG ── */
+    .logo-inline-svg { width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <div class="nav__inner">
+      <a href="#inicio" class="nav__logo">
+     
+       <!-- Reemplaza el <svg class="nav__logo-svg"> por: -->
+          <img src="img/logo.png" alt="P6 Express" class="nav__logo-svg" style="border-radius:50%; object-fit:cover;">
+          <circle cx="50" cy="50" r="50" fill="#0A0A0A"/>
+          <text x="50" y="62" text-anchor="middle" font-family="'Barlow Condensed', sans-serif" font-weight="900" font-size="52" fill="#C8FF00" letter-spacing="-2"></text>
+        </svg>
+        <span class="nav__logo-text">P6 <span>Express</span></span>
+      </a>
+      <button class="nav__burger" id="burger" aria-label="Menú">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav__links" id="navLinks">
+        <li><a href="#nosotros">Nosotros</a></li>
+        <li><a href="#servicios">Servicios</a></li>
+        <li><a href="#como-funciona">Cómo funciona</a></li>
+        <li><a href="#info">Pagos</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+        <li>
+          <a href="https://wa.me/573107235773?text=Hola%20P6%20Express%2C%20quiero%20hacer%20un%20pedido" target="_blank" class="nav__cta">Pedir ya</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="inicio">
+    <div class="hero__content">
+      <div class="hero__badge">
+        <span class="badge__dot"></span>
+        <span>Activos en Quibdó</span>
+      </div>
+      <h1 class="hero__title">
+        Tu pedido,<br><em>a tu puerta.</em>
+      </h1>
+      <p class="hero__sub">Domicilios rápidos y confiables en Quibdó. Un mensaje y nosotros nos encargamos del resto.</p>
+      <div class="hero__actions">
+        <a href="https://wa.me/573107235773?text=Hola%20P6%20Express%2C%20quiero%20hacer%20un%20pedido" target="_blank" class="btn btn--primary">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.555 4.122 1.528 5.855L0 24l6.335-1.652A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.854 0-3.6-.498-5.11-1.371l-.37-.217-3.76.981.998-3.658-.24-.376A9.957 9.957 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+          Hacer pedido
+        </a>
+        <a href="#como-funciona" class="btn btn--ghost">Ver cómo funciona</a>
+      </div>
+      <div class="hero__stats">
+        <div class="stat">
+          <span class="stat__num">5+</span>
+          <span class="stat__label">Tipos de servicio</span>
+        </div>
+        <div class="stat__divider"></div>
+        <div class="stat">
+          <span class="stat__num">7</span>
+          <span class="stat__label">Días a la semana</span>
+        </div>
+        <div class="stat__divider"></div>
+        <div class="stat">
+          <span class="stat__num">100%</span>
+          <span class="stat__label">Confiable</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero visual: P6 logo grande + floating tags -->
+    <div class="hero__visual">
+      <div class="hero__logo-display">
+        <div class="hero__logo-bg">
+          <!-- Full brand logo SVG inline (replicates the P6 Express logo style) -->
+          <!-- Reemplaza el <svg class="nav__logo-svg"> por: -->
+<img src="img/logo.png" alt="P6 Express" class="nav__logo-svg" style="border-radius:50%; object-fit:cover;">
+            <defs>
+              <linearGradient id="limeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#E0FF60"/>
+                <stop offset="100%" stop-color="#C8FF00"/>
+              </linearGradient>
+            </defs>
+            <!-- Speed lines -->
+            <line x1="20" y1="120" x2="80" y2="120" stroke="#C8FF00" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+            <line x1="15" y1="135" x2="70" y2="135" stroke="#C8FF00" stroke-width="2" stroke-linecap="round" opacity="0.35"/>
+            <line x1="25" y1="150" x2="65" y2="150" stroke="#C8FF00" stroke-width="1.5" stroke-linecap="round" opacity="0.2"/>
+            <!-- P letter -->
+            <text x="145" y="160" text-anchor="middle" font-family="'Barlow Condensed', Impact, sans-serif" font-weight="900" font-size="130" fill="white" letter-spacing="-6">P</text>
+            <!-- 6 letter -->
+            <text x="230" y="160" text-anchor="middle" font-family="'Barlow Condensed', Impact, sans-serif" font-weight="900" font-size="130" fill="url(#limeGrad)" letter-spacing="-6">6</text>
+            <!-- EXPRESS text -->
+            <text x="150" y="205" text-anchor="middle" font-family="'Barlow Condensed', Impact, sans-serif" font-weight="900" font-size="42" fill="#C8FF00" letter-spacing="8">EXPRESS</text>
+            <!-- Tagline -->
+            <text x="150" y="228" text-anchor="middle" font-family="'Barlow', sans-serif" font-weight="500" font-size="11" fill="#7A8870" letter-spacing="2.5">TU PEDIDO, NUESTRA ENERGÍA</text>
+            <!-- Dots decoration -->
+            <circle cx="150" cy="248" r="2" fill="#C8FF00" opacity="0.4"/>
+            <circle cx="165" cy="248" r="2" fill="#C8FF00" opacity="0.4"/>
+            <circle cx="135" cy="248" r="2" fill="#C8FF00" opacity="0.4"/>
+          </svg>
+        </div>
+        <div class="float-tag float-tag--1">⚡ Rápido</div>
+        <div class="float-tag float-tag--2">🔒 Seguro</div>
+        <div class="float-tag float-tag--3">📍 Quibdó</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOBRE NOSOTROS -->
+  <section class="about section" id="nosotros">
+    <div class="container">
+      <div class="about__inner">
+        <div class="about__text">
+          <span class="section-tag">Quiénes somos</span>
+          <h2 class="section-title">Un equipo local<br>para <span class="accent">servirte mejor.</span></h2>
+          <p>Somos un equipo comprometido de Quibdó que une cercanía y eficiencia para ofrecer un servicio de domicilios confiable, rápido y pensado para nuestra comunidad.</p>
+          <p>Conocemos la ciudad, conocemos a nuestra gente — y eso nos permite servirte como nadie más puede hacerlo.</p>
+          <div class="about__chips">
+            <span class="chip">🏙️ Equipo local</span>
+            <span class="chip">📱 100% por WhatsApp</span>
+            <span class="chip">🤝 Confianza real</span>
+            <span class="chip">✅ Servicio garantizado</span>
+          </div>
+        </div>
+        <div class="about__graphic">
+          <div class="trust-card">
+            <div class="trust-card__header">
+              <div class="trust-icon">🛵</div>
+              <div class="trust-label">P6 Express</div>
+            </div>
+            <ul class="trust-list">
+              <li><span class="trust-check">✓</span> Entrega puntual garantizada</li>
+              <li><span class="trust-check">✓</span> Comunicación directa y cercana</li>
+              <li><span class="trust-check">✓</span> Precios honestos y transparentes</li>
+              <li><span class="trust-check">✓</span> Servicio 7 días a la semana</li>
+              <li><span class="trust-check">✓</span> Equipo conocido en Quibdó</li>
+            </ul>
+            <div class="trust-footer">🟢 Activos y disponibles</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICIOS -->
+  <section class="services section" id="servicios">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Lo que hacemos</span>
+        <h2 class="section-title">Nuestros <span class="accent">servicios</span></h2>
+        <p class="section-desc">Un mensaje y nosotros nos encargamos del resto.</p>
+      </div>
+      <div class="services__grid">
+        <div class="service-card">
+          <div class="service-card__icon">🍔</div>
+          <h3>Comidas</h3>
+          <p>Restaurantes, comidas rápidas, antojos a domicilio.</p>
+          <span class="service-card__tag">Popular</span>
+        </div>
+        <div class="service-card">
+          <div class="service-card__icon">🛒</div>
+          <h3>Compras</h3>
+          <p>Supermercados, tiendas, lo que necesites del mercado.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-card__icon">💊</div>
+          <h3>Farmacia</h3>
+          <p>Medicamentos y productos de salud con rapidez.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-card__icon">⚙️</div>
+          <h3>Mandados</h3>
+          <p>Trámites, filas, recados — lo que necesites resolver.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-card__icon">📦</div>
+          <h3>Paquetes</h3>
+          <p>Envíos y entregas dentro de la ciudad.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CÓMO FUNCIONA -->
+  <section class="how section" id="como-funciona">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">El proceso</span>
+        <h2 class="section-title">Tan fácil como<br><span class="accent">enviar un mensaje</span></h2>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step__num">01</div>
+          <div class="step__icon-wrap">💬</div>
+          <h3>Escribes por WhatsApp</h3>
+          <p>Cuéntanos qué necesitas, sin formularios ni apps.</p>
+        </div>
+        <div class="step">
+          <div class="step__num">02</div>
+          <div class="step__icon-wrap">📋</div>
+          <h3>Envías lo que necesitas</h3>
+          <p>Foto, lista o nombre del producto — como quieras.</p>
+        </div>
+        <div class="step">
+          <div class="step__num">03</div>
+          <div class="step__icon-wrap">✅</div>
+          <h3>Confirmamos el pedido</h3>
+          <p>Te confirmamos precio, tiempo y método de pago.</p>
+        </div>
+        <div class="step">
+          <div class="step__num">04</div>
+          <div class="step__icon-wrap">🛵</div>
+          <h3>Entregamos</h3>
+          <p>Llegamos directo a tu ubicación. Sin complicaciones.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- POLÍTICA + PAGOS + HORARIOS -->
+  <section class="info-section section" id="info">
+    <div class="container">
+      <div class="info-grid">
+        <div class="info-card info-card--policy">
+          <div class="info-card__icon">📋</div>
+          <h3>Política de compras</h3>
+          <p>Las compras por encargo requieren <strong>pago anticipado</strong> del valor de los productos. Debes enviar el comprobante para que iniciemos el servicio.</p>
+          <div class="info-card__note">⚠️ Sin comprobante no se inicia la gestión</div>
+        </div>
+
+        <div class="info-card info-card--pay">
+          <div class="info-card__icon">💳</div>
+          <h3>Métodos de pago</h3>
+          <div class="pay-method">
+            <div class="pay-method__logo pay-method__logo--nequi">N</div>
+            <div>
+              <span class="pay-method__name">Nequi</span>
+              <span class="pay-method__num">310 723 5773</span>
+            </div>
+            <button class="copy-btn" data-copy="3107235773" title="Copiar número">📋</button>
+          </div>
+          <div class="pay-method">
+            <div class="pay-method__logo pay-method__logo--bc">B</div>
+            <div>
+              <span class="pay-method__name">Bancolombia Ahorros</span>
+              <span class="pay-method__num">536 57375116</span>
+            </div>
+            <button class="copy-btn" data-copy="53657375116" title="Copiar número">📋</button>
+          </div>
+        </div>
+
+        <div class="info-card info-card--hours">
+          <div class="info-card__icon">🕐</div>
+          <h3>Horarios</h3>
+          <div class="schedule">
+            <div class="schedule__row">
+              <span class="schedule__days">Lunes – Viernes</span>
+              <span class="schedule__time">2:00 PM – 8:00 PM</span>
+            </div>
+            <div class="schedule__divider"></div>
+            <div class="schedule__row">
+              <span class="schedule__days">Sábados y Domingos</span>
+              <div>
+                <span class="schedule__time">9:00 AM – 12:00 PM</span>
+                <span class="schedule__time">2:00 PM – 8:00 PM</span>
+              </div>
+            </div>
+          </div>
+          <div class="schedule__status" id="scheduleStatus"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACTO / CTA -->
+  <section class="cta" id="contacto">
+    <div class="container" style="position:relative;z-index:1;">
+      <h2>¿Listo para tu<br><span class="accent">primer pedido?</span></h2>
+      <p>Un mensaje es todo lo que necesitas. Estamos en Quibdó, para Quibdó.</p>
+      <a href="https://wa.me/573107235773?text=Hola%20P6%20Express%2C%20quiero%20hacer%20un%20pedido" target="_blank" class="btn btn--primary btn--xl">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.555 4.122 1.528 5.855L0 24l6.335-1.652A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.854 0-3.6-.498-5.11-1.371l-.37-.217-3.76.981.998-3.658-.24-.376A9.957 9.957 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+        Escribirnos ahora
+      </a>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <div class="footer__brand">
+        <div class="footer__logo">
+          <svg class="footer__logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="50" fill="#181C16"/>
+            <text x="50" y="64" text-anchor="middle" font-family="'Barlow Condensed', sans-serif" font-weight="900" font-size="52" fill="#C8FF00" letter-spacing="-2">P6</text>
+          </svg>
+          <span class="footer__logo-text">P6 <span>Express</span></span>
+        </div>
+        <p>Domicilios rápidos en Quibdó.<br>Confiables, cercanos y siempre listos.</p>
+      </div>
+      <div class="footer__links">
+        <h4>Navegación</h4>
+        <a href="#nosotros">Nosotros</a>
+        <a href="#servicios">Servicios</a>
+        <a href="#como-funciona">Cómo funciona</a>
+        <a href="#info">Pagos y horarios</a>
+      </div>
+      <div class="footer__social">
+        <h4>Contacto</h4>
+        <a href="https://wa.me/573107235773" target="_blank" class="social-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.555 4.122 1.528 5.855L0 24l6.335-1.652A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.854 0-3.6-.498-5.11-1.371l-.37-.217-3.76.981.998-3.658-.24-.376A9.957 9.957 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+          WhatsApp
+        </a>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2025 P6 Express · Quibdó, Chocó</span>
+      <span>Tu pedido, nuestra energía 🛵</span>
+    </div>
+  </footer>
+
+  <!-- WA FLOAT -->
+  <a href="https://wa.me/573107235773?text=Hola%20P6%20Express%2C%20quiero%20hacer%20un%20pedido" target="_blank" class="wa-float" aria-label="WhatsApp">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.555 4.122 1.528 5.855L0 24l6.335-1.652A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.854 0-3.6-.498-5.11-1.371l-.37-.217-3.76.981.998-3.658-.24-.376A9.957 9.957 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+    <span class="wa-float__tooltip">¡Pedir ahora!</span>
+  </a>
+
+  <script>
+    // Burger menu
+    const burger = document.getElementById('burger');
+    const navLinks = document.getElementById('navLinks');
+    burger.addEventListener('click', () => {
+      burger.classList.toggle('open');
+      navLinks.classList.toggle('open');
+    });
+    navLinks.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        burger.classList.remove('open');
+        navLinks.classList.remove('open');
+      });
+    });
+
+    // Copy buttons
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        navigator.clipboard.writeText(btn.dataset.copy).then(() => {
+          const orig = btn.textContent;
+          btn.textContent = '✅';
+          setTimeout(() => btn.textContent = orig, 1500);
+        });
+      });
+    });
+
+    // Schedule status
+    function updateStatus() {
+      const el = document.getElementById('scheduleStatus');
+      if (!el) return;
+      const now = new Date();
+      const day = now.getDay(); // 0=Sun, 1=Mon...
+      const h = now.getHours() + now.getMinutes() / 60;
+      let open = false;
+      if (day >= 1 && day <= 5) {
+        open = h >= 14 && h < 20;
+      } else {
+        open = (h >= 9 && h < 12) || (h >= 14 && h < 20);
+      }
+      el.textContent = open ? '🟢 Estamos abiertos ahora' : '🔴 Cerrado actualmente';
+      el.className = 'schedule__status ' + (open ? 'status--open' : 'status--closed');
+    }
+    updateStatus();
+    setInterval(updateStatus, 60000);
+  </script>
+</body>
+</html>
