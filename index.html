@@ -440,6 +440,11 @@
       .footer__inner { grid-template-columns: 1fr; gap: 2rem; }
     }
 
+    .hero__logo-svg {
+  width: 78%;
+  display: block;
+}
+
     /* ── WA FLOAT ── */
     .wa-float {
       position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 200;
@@ -532,41 +537,40 @@
     </div>
 
     <!-- Hero visual: P6 logo grande + floating tags -->
-    <div class="hero__visual">
-      <div class="hero__logo-display">
-        <div class="hero__logo-bg">
-          <!-- Full brand logo SVG inline (replicates the P6 Express logo style) -->
-          <!-- Reemplaza el <svg class="nav__logo-svg"> por: -->
-<img src="img/logo.png" alt="P6 Express" class="nav__logo-svg" style="border-radius:50%; object-fit:cover;">
-            <defs>
-              <linearGradient id="limeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#E0FF60"/>
-                <stop offset="100%" stop-color="#C8FF00"/>
-              </linearGradient>
-            </defs>
-            <!-- Speed lines -->
-            <line x1="20" y1="120" x2="80" y2="120" stroke="#C8FF00" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
-            <line x1="15" y1="135" x2="70" y2="135" stroke="#C8FF00" stroke-width="2" stroke-linecap="round" opacity="0.35"/>
-            <line x1="25" y1="150" x2="65" y2="150" stroke="#C8FF00" stroke-width="1.5" stroke-linecap="round" opacity="0.2"/>
-            <!-- P letter -->
-            <text x="145" y="160" text-anchor="middle" font-family="'Barlow Condensed', Impact, sans-serif" font-weight="900" font-size="130" fill="white" letter-spacing="-6">P</text>
-            <!-- 6 letter -->
-            <text x="230" y="160" text-anchor="middle" font-family="'Barlow Condensed', Impact, sans-serif" font-weight="900" font-size="130" fill="url(#limeGrad)" letter-spacing="-6">6</text>
-            <!-- EXPRESS text -->
-            <text x="150" y="205" text-anchor="middle" font-family="'Barlow Condensed', Impact, sans-serif" font-weight="900" font-size="42" fill="#C8FF00" letter-spacing="8">EXPRESS</text>
-            <!-- Tagline -->
-            <text x="150" y="228" text-anchor="middle" font-family="'Barlow', sans-serif" font-weight="500" font-size="11" fill="#7A8870" letter-spacing="2.5">TU PEDIDO, NUESTRA ENERGÍA</text>
-            <!-- Dots decoration -->
-            <circle cx="150" cy="248" r="2" fill="#C8FF00" opacity="0.4"/>
-            <circle cx="165" cy="248" r="2" fill="#C8FF00" opacity="0.4"/>
-            <circle cx="135" cy="248" r="2" fill="#C8FF00" opacity="0.4"/>
-          </svg>
-        </div>
-        <div class="float-tag float-tag--1">⚡ Rápido</div>
-        <div class="float-tag float-tag--2">🔒 Seguro</div>
-        <div class="float-tag float-tag--3">📍 Quibdó</div>
-      </div>
+   <!-- Hero visual: P6 logo grande + floating tags -->
+<div class="hero__visual">
+  <div class="hero__logo-display">
+    <div class="hero__logo-bg">
+      <svg class="hero__logo-svg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="limeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#E2FF70"/>
+            <stop offset="100%" stop-color="#C8FF00"/>
+          </linearGradient>
+        </defs>
+        <!-- Speed lines -->
+        <line x1="18" y1="148" x2="62" y2="148" stroke="#C8FF00" stroke-width="3" stroke-linecap="round" opacity="0.55"/>
+        <line x1="12" y1="162" x2="52" y2="162" stroke="#C8FF00" stroke-width="2" stroke-linecap="round" opacity="0.35"/>
+        <line x1="20" y1="176" x2="50" y2="176" stroke="#C8FF00" stroke-width="1.5" stroke-linecap="round" opacity="0.2"/>
+        <!-- P -->
+        <text x="130" y="185" text-anchor="middle" font-family="'Barlow Condensed', Impact, sans-serif" font-weight="900" font-size="150" fill="#FFFFFF" letter-spacing="-4">P</text>
+        <!-- 6 -->
+        <text x="218" y="185" text-anchor="middle" font-family="'Barlow Condensed', Impact, sans-serif" font-weight="900" font-size="150" fill="url(#limeGrad)" letter-spacing="-4">6</text>
+        <!-- EXPRESS -->
+        <text x="150" y="228" text-anchor="middle" font-family="'Barlow Condensed', Impact, sans-serif" font-weight="900" font-size="40" fill="#C8FF00" letter-spacing="10">EXPRESS</text>
+        <!-- Tagline -->
+        <text x="150" y="252" text-anchor="middle" font-family="'Barlow', sans-serif" font-weight="500" font-size="11" fill="#6B7565" letter-spacing="2.5">TU PEDIDO, NUESTRA ENERGÍA</text>
+        <!-- Dots -->
+        <circle cx="135" cy="270" r="2.2" fill="#C8FF00" opacity="0.4"/>
+        <circle cx="150" cy="270" r="2.2" fill="#C8FF00" opacity="0.4"/>
+        <circle cx="165" cy="270" r="2.2" fill="#C8FF00" opacity="0.4"/>
+      </svg>
     </div>
+    <div class="float-tag float-tag--1">⚡ Rápido</div>
+    <div class="float-tag float-tag--2">🔒 Seguro</div>
+    <div class="float-tag float-tag--3">📍 Quibdó</div>
+  </div>
+</div>
   </section>
 
   <!-- SOBRE NOSOTROS -->
