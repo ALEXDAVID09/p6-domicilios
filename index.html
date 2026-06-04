@@ -556,6 +556,14 @@
     transform:translateY(0px);
   }
 }
+#siteContent{
+  opacity:0;
+  transition:opacity .8s ease;
+}
+
+#siteContent.loaded{
+  opacity:1;
+}
 
   </style>
 </head>
@@ -601,7 +609,6 @@
         <li><a href="#nosotros">Nosotros</a></li>
         <li><a href="#servicios">Servicios</a></li>
         <li><a href="#como-funciona">Cómo funciona</a></li>
-        <li><a href="#info">Pagos</a></li>
         <li><a href="#contacto">Contacto</a></li>
         <li>
           <a href="https://wa.me/573107235773?text=Hola%20P6%20Express%2C%20quiero%20hacer%20un%20pedido" target="_blank" class="nav__cta">Pedir ya</a>
@@ -919,7 +926,7 @@
   </div>
 
   <div class="footer__bottom">
-    <span>© 2025 P6 Express · Quibdó, Chocó</span>
+    <span>© 2026 P6 Express · Quibdó, Chocó</span>
     <span>Tu pedido, nuestra energía 🛵</span>
   </div>
 </footer>
@@ -995,6 +1002,10 @@ window.addEventListener('load', () => {
   },2500);
 
 });
+  
+document.getElementById('siteContent')
+  .classList.add('loaded');
+
   </script>
   </div>
   
